@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,14 +36,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-   //credit to: https://stackoverflow.com/questions/71220577/long-press-time-consider-for-gesturedetector
-   late Timer _timer;
+   //https://stackoverflow.com/questions/71220577/long-press-time-consider-for-gesturedetector
+   //late Timer _timer;
+   AudioPlayer _player = AudioPlayer();
    bool _isBlue = true;
  
-   void _startHorn() {
+   void _startHorn() async {
      //_timer = Timer(const Duration(milliseconds: 200), () {
+       //await _player.stop();
        print('Playing horn');
        setState(() => _isBlue = false);
+       await AudioPlayer.clearAssetCache();
+       await _player.setAsset('assets/sounds/airhorn-sfx.mp3');
+       await _player.play();
+   }
+   
+   void _stopHorn() async {
+       print('Stopping horn');
+       setState(() => _isBlue = true);
+       await _player.stop();
    }
  
    Widget _horn256() {
@@ -50,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
        onTapUp: (ds) {
            //_timer.cancel();
            setState(() => _isBlue = true);
+           //_stopHorn();
        },
        child: Container(
          width: 128,
@@ -68,7 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _horn256_inv() {
      return GestureDetector(
        onTapDown: (ds) {
-         setState(() => _isBlue = false);
+         //setState(() => _isBlue = false);
+         _startHorn();
        },
        child: Container(
          width: 128,
@@ -100,11 +114,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton( //share
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
